@@ -12,12 +12,26 @@ GIST_ID = os.environ["GIST_ID"]
 
 client = genai.Client(api_key=GENAI_KEY)
 
+def get_live_prices():
+    """Fetch accurate prices from CoinGecko (free, no API key needed)"""
+    try:
+        url = "https://api.coingecko.com/api/v3/simple/price"
+        params = {
+            "ids": "bitcoin,ethereum",
+            "vs_currencies": "usd"
+        }
+        response = requests.get(url, params=params, timeout=10)
+        data = response.json()
+        return {
+            "btc": data["bitcoin"]["usd"],
+            "eth": data["ethereum"]["usd"]
+        }
+    except Exception as e:
+        print(f"Price fetch error: {e}")
+        return None
+
 def get_market_data():
     queries = [
-        # Prices
-        "Bitcoin price today usd",
-        "Ethereum price today usd",
-        
         # Macro & Geopolitics
         "geopolitical news today risk markets oil gold",
         "US China trade war tariffs latest news",
@@ -52,19 +66,26 @@ def get_market_data():
             results.extend(r)
     return str(results)
 
-def analyze_market(search_data):
+def analyze_market(search_data, live_prices):
+    # Include live prices in the prompt so Gemini uses them
+    price_info = ""
+    if live_prices:
+        price_info = f"LIVE PRICES (use these exact values): BTC = ${live_prices['btc']:,.2f}, ETH = ${live_prices['eth']:,.2f}"
+    
     prompt = f"""
 Role: Senior Crypto Market Analyst & Day Trading Assistant
 
 You are analyzing this search data to provide a market overview. Output ONLY valid JSON, no markdown.
+
+{price_info}
 
 Search Data: {search_data}
 
 Analyze the data and output this exact JSON structure:
 
 {{
-    "btc_price": "$XX,XXX",
-    "eth_price": "$X,XXX",
+    "btc_price": "${live_prices['btc']:,.2f}" if live_prices else "$XX,XXX",
+    "eth_price": "${live_prices['eth']:,.2f}" if live_prices else "$X,XXX",
     
     "macro": {{
         "geopolitics": "Brief summary of any conflict/trade war news affecting markets",
@@ -109,6 +130,7 @@ Analyze the data and output this exact JSON structure:
 }}
 
 Important:
+- Use the LIVE PRICES provided above for btc_price and eth_price
 - Use actual data from the search results where available
 - If data is not found, say "No recent data" rather than making it up
 - Keep each field concise
@@ -134,11 +156,24 @@ def update_gist(data):
     requests.patch(f"https://api.github.com/gists/{GIST_ID}", json=payload, headers=headers)
 
 if __name__ == "__main__":
-    print("Starting analysis...")
+    print("Fetching live prices...")
+    live_prices = get_live_prices()
+    if live_prices:
+        print(f"BTC: ${live_prices['btc']:,.2f}, ETH: ${live_prices['eth']:,.2f}")
+    
+    print("Fetching market data...")
     raw_data = get_market_data()
-    print("Data fetched. Analyzing...")
-    json_output = analyze_market(raw_data)
+    
+    print("Analyzing with Gemini...")
+    json_output = analyze_market(raw_data, live_prices)
+    
+    # Override with accurate prices
+    if live_prices:
+        json_output["btc_price"] = f"${live_prices['btc']:,.2f}"
+        json_output["eth_price"] = f"${live_prices['eth']:,.2f}"
+    
     json_output["updated"] = datetime.utcnow().strftime("%H:%M UTC")
-    print("Analysis complete. Updating Gist...")
+    
+    print("Updating Gist...")
     update_gist(json_output)
     print("Done!")
