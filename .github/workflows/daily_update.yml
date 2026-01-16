@@ -1,0 +1,28 @@
+name: Hourly Crypto Update
+
+on:
+  schedule:
+    - cron: "0 * * * *" # Every hour at minute 0
+  workflow_dispatch: # Manual trigger button
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install Dependencies
+        run: |
+          pip install google-generativeai duckduckgo-search requests
+
+      - name: Run Script
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID }}
+        run: python main.py
