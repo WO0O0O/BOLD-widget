@@ -29,5 +29,5 @@ Built by Daniel Wooster.
 
 ## Docs
 
-- [Setup Guide](docs/SETUP_GUIDE.md)
+- [Overview](docs/OVERVIEW.md)
 - [Limits](docs/LIMITS.md)
