@@ -89,16 +89,16 @@ async function showDetailView(data) {
   table.addRow(headerRow);
 
   // ─── ACTIONABLE SUMMARY ───
-  addSection(table, "📋 ACTIONABLE INSIGHT");
+  addSection(table, "ACTIONABLE INSIGHT");
   addTextRow(table, data.summary, "#fff", 16);
 
   // ─── PRICES ───
-  addSection(table, "💰 PRICES");
+  addSection(table, "PRICES");
   addRow(table, "Bitcoin", data.btc_price, "#f7931a");
   addRow(table, "Ethereum", data.eth_price, "#627eea");
 
   // ─── SECTION 1: MACRO & GEOPOLITICAL ───
-  addSection(table, "🌍 MACRO & GEOPOLITICAL LANDSCAPE");
+  addSection(table, "MACRO & GEOPOLITICAL LANDSCAPE");
 
   if (data.macro) {
     addSubSection(table, "Geopolitics");
@@ -116,7 +116,7 @@ async function showDetailView(data) {
   }
 
   // ─── REGULATORY ───
-  addSection(table, "⚖️ REGULATORY & LEGAL");
+  addSection(table, "REGULATORY & LEGAL");
 
   if (data.regulatory) {
     addTextRow(table, "SEC: " + safe(data, "regulatory.sec_news"));
@@ -127,7 +127,7 @@ async function showDetailView(data) {
   }
 
   // ─── WHALES ───
-  addSection(table, "🐋 WHALE ACTIVITY");
+  addSection(table, "WHALE ACTIVITY");
 
   if (data.whales) {
     addTextRow(table, safe(data, "whales.activity"));
@@ -142,7 +142,7 @@ async function showDetailView(data) {
   }
 
   // ─── SECTION 2: TECHNICAL ANALYSIS ───
-  addSection(table, "📊 TECHNICAL ANALYSIS");
+  addSection(table, "TECHNICAL ANALYSIS");
 
   if (data.technicals) {
     // BTC Table
@@ -197,7 +197,7 @@ async function showDetailView(data) {
   }
 
   // ─── SECTION 3: SENTIMENT ───
-  addSection(table, "🎯 SENTIMENT & CATALYSTS");
+  addSection(table, "SENTIMENT & CATALYSTS");
 
   if (data.sentiment) {
     addRow(
@@ -229,7 +229,7 @@ async function showDetailView(data) {
   }
 
   // ─── SECTION 4: NEWS LINKS ───
-  addSection(table, "📰 NEWS LINKS");
+  addSection(table, "NEWS LINKS");
 
   if (data.news_links && data.news_links.length > 0) {
     for (let news of data.news_links) {
