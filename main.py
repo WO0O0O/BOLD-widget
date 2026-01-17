@@ -167,7 +167,7 @@ Important:
             return json.loads(clean_json)
         except Exception as e:
             if attempt < max_retries - 1:
-                wait_time = (2 ** attempt) * 5  # 5s, 10s, 20s
+                wait_time = (2 ** attempt) * 30  # 30s, 60s, 120s - handles minute-based rate limits
                 print(f"Gemini API error (attempt {attempt + 1}/{max_retries}): {e}")
                 print(f"Retrying in {wait_time} seconds...")
                 time.sleep(wait_time)
