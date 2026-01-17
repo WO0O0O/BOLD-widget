@@ -1,5 +1,5 @@
 // CryptoTick Widget - by Daniel Wooster
-// Full Market Analysis Report
+// BTC & Gold Market Analysis
 
 const GIST_URL =
   "https://gist.githubusercontent.com/WO0O0O/43171059615e0008db423e0ace9e8e6a/raw/crypto_data.json";
@@ -39,14 +39,14 @@ async function createWidget(data) {
   w.addSpacer(8);
 
   // BTC
-  let btc = w.addText("₿ " + data.btc_price);
+  let btc = w.addText("BTC " + data.btc_price);
   btc.font = Font.boldSystemFont(20);
   btc.textColor = Color.white();
 
-  // ETH
-  let eth = w.addText("Ξ " + data.eth_price);
-  eth.font = Font.boldSystemFont(16);
-  eth.textColor = new Color("#aaa");
+  // Gold
+  let gold = w.addText("XAU " + data.gold_price);
+  gold.font = Font.boldSystemFont(16);
+  gold.textColor = new Color("#ffd700");
 
   w.addSpacer(8);
 
@@ -59,7 +59,7 @@ async function createWidget(data) {
   w.addSpacer(4);
 
   // Fear & Greed
-  let fg = w.addText("F&G: " + safe(data, "sentiment.fear_greed"));
+  let fg = w.addText("F&G: " + safe(data, "btc.sentiment.fear_greed"));
   fg.font = Font.systemFont(10);
   fg.textColor = new Color("#666");
 
@@ -80,7 +80,7 @@ async function showDetailView(data) {
   headerRow.backgroundColor = new Color("#1a1a2e");
   let biasCell = headerRow.addText(
     data.bias,
-    "Market Analysis: " + (data.date || data.updated)
+    "Market Analysis: " + (data.date || data.updated),
   );
   biasCell.titleColor = new Color(data.bias_color);
   biasCell.titleFont = Font.heavySystemFont(32);
@@ -95,144 +95,156 @@ async function showDetailView(data) {
   // ─── PRICES ───
   addSection(table, "PRICES");
   addRow(table, "Bitcoin", data.btc_price, "#f7931a");
-  addRow(table, "Ethereum", data.eth_price, "#627eea");
+  addRow(table, "Gold", data.gold_price, "#ffd700");
 
-  // ─── SECTION 1: MACRO & GEOPOLITICAL ───
-  addSection(table, "MACRO & GEOPOLITICAL LANDSCAPE");
+  // ─── MACRO & GEOPOLITICAL ───
+  addSection(table, "MACRO & GEOPOLITICAL");
 
   if (data.macro) {
-    addSubSection(table, "Geopolitics");
     addTextRow(table, safe(data, "macro.geopolitics"));
-
-    if (data.macro.trade) {
-      addSubSection(table, "Trade");
-      addTextRow(table, safe(data, "macro.trade"));
-    }
-
-    addSubSection(table, "Central Bank & Economy");
     addTextRow(table, "Fed: " + safe(data, "macro.fed"));
-    addTextRow(table, "Data Releases: " + safe(data, "macro.data_releases"));
+    addTextRow(table, "Data: " + safe(data, "macro.data_releases"));
     addTextRow(table, "DXY/Yields: " + safe(data, "macro.dxy_yields"));
   }
 
-  // ─── REGULATORY ───
-  addSection(table, "REGULATORY & LEGAL");
+  // ═══════════════════════════════════════════════════════════════
+  // BITCOIN SECTION
+  // ═══════════════════════════════════════════════════════════════
 
-  if (data.regulatory) {
-    addTextRow(table, "SEC: " + safe(data, "regulatory.sec_news"));
-    addTextRow(table, "ETF Flows: " + safe(data, "regulatory.etf_flows"));
-    if (data.regulatory.other) {
-      addTextRow(table, "Other: " + safe(data, "regulatory.other"));
+  addSection(table, "BITCOIN ANALYSIS");
+
+  // BTC Regulatory
+  if (data.btc && data.btc.regulatory) {
+    addSubSection(table, "Regulatory & ETF Flows");
+    addTextRow(table, "SEC: " + safe(data, "btc.regulatory.sec_news"));
+    addTextRow(table, "ETF Flows: " + safe(data, "btc.regulatory.etf_flows"));
+  }
+
+  // BTC Whales
+  if (data.btc && data.btc.whales) {
+    addSubSection(table, "Whale Activity");
+    addTextRow(table, safe(data, "btc.whales.activity"));
+    if (safe(data, "btc.whales.notable") !== "No recent data") {
+      addTextRow(table, "Notable: " + safe(data, "btc.whales.notable"));
     }
   }
 
-  // ─── WHALES ───
-  addSection(table, "WHALE ACTIVITY");
-
-  if (data.whales) {
-    addTextRow(table, safe(data, "whales.activity"));
-    if (data.whales.positioning) {
-      addTextRow(table, "Positioning: " + safe(data, "whales.positioning"));
-    }
-    if (data.whales.notable) {
-      addTextRow(table, "Notable: " + safe(data, "whales.notable"));
-    }
-  } else if (data.regulatory && data.regulatory.whale_activity) {
-    addTextRow(table, safe(data, "regulatory.whale_activity"));
-  }
-
-  // ─── SECTION 2: TECHNICAL ANALYSIS ───
-  addSection(table, "TECHNICAL ANALYSIS");
-
-  if (data.technicals) {
-    // BTC Table
-    addSubSection(table, "Bitcoin");
+  // BTC Technicals
+  if (data.btc && data.btc.technicals) {
+    addSubSection(table, "Technical Analysis");
     addTechRow(
       table,
       "Support",
-      safe(data, "technicals.btc_intraday_support"),
-      "#4ade80"
+      safe(data, "btc.technicals.intraday_support"),
+      "#4ade80",
     );
     addTechRow(
       table,
       "Resistance",
-      safe(data, "technicals.btc_intraday_resistance"),
-      "#f87171"
+      safe(data, "btc.technicals.intraday_resistance"),
+      "#f87171",
     );
     addTechRow(
       table,
       "1M Support",
-      safe(data, "technicals.btc_1m_support"),
-      "#888"
+      safe(data, "btc.technicals.monthly_support"),
+      "#888",
     );
-    if (data.technicals.btc_trend) {
-      addTextRow(table, "Trend: " + safe(data, "technicals.btc_trend"));
-    }
-    addTextRow(table, safe(data, "technicals.btc_chart_note"));
+    addTextRow(table, "Trend: " + safe(data, "btc.technicals.trend"));
+    addTextRow(table, safe(data, "btc.technicals.chart_note"));
+  }
 
-    // ETH Table
-    addSubSection(table, "Ethereum");
+  // BTC Sentiment
+  if (data.btc && data.btc.sentiment) {
+    addSubSection(table, "Sentiment");
+    addRow(
+      table,
+      "Fear & Greed",
+      safe(data, "btc.sentiment.fear_greed"),
+      "#fff",
+    );
+
+    let liqUp = safe(data, "btc.sentiment.liquidations_up");
+    let liqDown = safe(data, "btc.sentiment.liquidations_down");
+    if (liqUp !== "No recent data") {
+      addLiqRow(table, "Short Squeeze Zone", liqUp, "#4ade80");
+    }
+    if (liqDown !== "No recent data") {
+      addLiqRow(table, "Long Liquidation Zone", liqDown, "#f87171");
+    }
+
+    addTextRow(table, safe(data, "btc.sentiment.narratives"));
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // GOLD SECTION
+  // ═══════════════════════════════════════════════════════════════
+
+  addSection(table, "GOLD ANALYSIS");
+
+  // Gold Flows
+  if (data.gold && data.gold.flows) {
+    addSubSection(table, "ETF & Institutional Flows");
+    addTextRow(table, "ETF Flows: " + safe(data, "gold.flows.etf_flows"));
+    addTextRow(
+      table,
+      "Central Banks: " + safe(data, "gold.flows.central_banks"),
+    );
+    if (safe(data, "gold.flows.institutional") !== "No recent data") {
+      addTextRow(
+        table,
+        "Institutional: " + safe(data, "gold.flows.institutional"),
+      );
+    }
+  }
+
+  // Gold Demand
+  if (data.gold && data.gold.demand) {
+    addSubSection(table, "Demand & Supply");
+    addTextRow(table, "Physical: " + safe(data, "gold.demand.physical"));
+    addTextRow(table, "Investment: " + safe(data, "gold.demand.investment"));
+    if (safe(data, "gold.demand.supply") !== "No recent data") {
+      addTextRow(table, "Supply: " + safe(data, "gold.demand.supply"));
+    }
+  }
+
+  // Gold Technicals
+  if (data.gold && data.gold.technicals) {
+    addSubSection(table, "Technical Analysis");
     addTechRow(
       table,
       "Support",
-      safe(data, "technicals.eth_intraday_support"),
-      "#4ade80"
+      safe(data, "gold.technicals.intraday_support"),
+      "#4ade80",
     );
     addTechRow(
       table,
       "Resistance",
-      safe(data, "technicals.eth_intraday_resistance"),
-      "#f87171"
+      safe(data, "gold.technicals.intraday_resistance"),
+      "#f87171",
     );
     addTechRow(
       table,
       "1M Support",
-      safe(data, "technicals.eth_1m_support"),
-      "#888"
+      safe(data, "gold.technicals.monthly_support"),
+      "#888",
     );
-    if (data.technicals.eth_trend) {
-      addTextRow(table, "Trend: " + safe(data, "technicals.eth_trend"));
-    }
-    addTextRow(table, safe(data, "technicals.eth_chart_note"));
+    addTextRow(table, "Trend: " + safe(data, "gold.technicals.trend"));
+    addTextRow(table, safe(data, "gold.technicals.chart_note"));
   }
 
-  // ─── SECTION 3: SENTIMENT ───
-  addSection(table, "SENTIMENT & CATALYSTS");
-
-  if (data.sentiment) {
-    let fgValue = safe(data, "sentiment.fear_greed");
-    if (fgValue && fgValue !== "No recent data") {
-      addRow(table, "Fear & Greed Index", fgValue, "#fff");
-    }
-
-    if (data.sentiment.fear_greed_note) {
-      addTextRow(table, safe(data, "sentiment.fear_greed_note"));
-    }
-
-    let liqUp = safe(data, "sentiment.liquidations_up");
-    let liqDown = safe(data, "sentiment.liquidations_down");
-
-    if (
-      (liqUp && liqUp !== "No recent data") ||
-      (liqDown && liqDown !== "No recent data")
-    ) {
-      addSubSection(table, "Liquidation Heatmap");
-      if (liqUp && liqUp !== "No recent data") {
-        addLiqRow(table, "Short Squeeze Zone", liqUp, "#4ade80");
-      }
-      if (liqDown && liqDown !== "No recent data") {
-        addLiqRow(table, "Long Liquidation Zone", liqDown, "#f87171");
-      }
-    }
-
-    let narratives = safe(data, "sentiment.narratives");
-    if (narratives && narratives !== "No recent data") {
-      addSubSection(table, "Narratives");
-      addTextRow(table, narratives);
-    }
+  // Gold Sentiment
+  if (data.gold && data.gold.sentiment) {
+    addSubSection(table, "Sentiment");
+    addTextRow(table, "Safe Haven: " + safe(data, "gold.sentiment.safe_haven"));
+    addTextRow(
+      table,
+      "Gold/Silver Ratio: " + safe(data, "gold.sentiment.gold_silver_ratio"),
+    );
+    addTextRow(table, safe(data, "gold.sentiment.narratives"));
   }
 
-  // ─── SECTION 4: NEWS LINKS ───
+  // ─── NEWS LINKS ───
   addSection(table, "NEWS LINKS");
 
   if (data.news_links && data.news_links.length > 0) {

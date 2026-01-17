@@ -1,6 +1,6 @@
 # Crypto Widget
 
-Free iPhone widget that shows live crypto prices and market analysis. Runs on GitHub Actions, uses Gemini AI for analysis, stores data in a Gist, displays via Scriptable.
+Free iPhone widget that shows live BTC and Gold prices with market analysis. Runs on GitHub Actions, uses Gemini AI for analysis, stores data in a Gist, displays via Scriptable.
 
 Built by Daniel Wooster.
 
