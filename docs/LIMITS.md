@@ -26,11 +26,13 @@ Quick reference for free tier limits and expected usage.
 
 | Metric       | Free Tier Limit | Your Usage |
 | ------------ | --------------- | ---------- |
-| Requests/min | 15              | 1          |
-| Requests/day | 1,500           | 48         |
-| Tokens/min   | 1,000,000       | ~10,000    |
+| Requests/min | 10              | 1          |
+| Requests/day | 500             | 48         |
+| Tokens/min   | 250,000         | ~10,000    |
 
-**Model:** gemini-2.5-flash
+**Model:** gemini-2.0-flash
+
+> **Note:** gemini-2.5-flash has only 20 RPD on free tier. We use 2.0-flash for its 500 RPD limit.
 
 **Monitor:** [Gemini Rate Limits](https://ai.dev/rate-limit)
 
