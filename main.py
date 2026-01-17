@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import requests
 from google import genai
 from ddgs import DDGS
@@ -57,8 +58,13 @@ def get_market_data():
     results = []
     with DDGS() as ddgs:
         for q in queries:
-            r = list(ddgs.text(q, max_results=3))
-            results.extend(r)
+            try:
+                r = list(ddgs.text(q, max_results=3))
+                results.extend(r)
+                time.sleep(0.5)  # Delay between queries to avoid rate limiting
+            except Exception as e:
+                print(f"DDG query failed for '{q}': {e}")
+                continue
     return str(results)
 
 def analyze_market(search_data, live_prices):
@@ -149,12 +155,25 @@ Important:
 - Output ONLY JSON, no markdown
 """
     
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt
-    )
-    clean_json = response.text.replace('```json', '').replace('```', '').strip()
-    return json.loads(clean_json)
+    # Retry with exponential backoff for rate limits
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt
+            )
+            clean_json = response.text.replace('```json', '').replace('```', '').strip()
+            return json.loads(clean_json)
+        except Exception as e:
+            if attempt < max_retries - 1:
+                wait_time = (2 ** attempt) * 5  # 5s, 10s, 20s
+                print(f"Gemini API error (attempt {attempt + 1}/{max_retries}): {e}")
+                print(f"Retrying in {wait_time} seconds...")
+                time.sleep(wait_time)
+            else:
+                print(f"Gemini API failed after {max_retries} attempts: {e}")
+                raise
 
 def update_gist(data):
     headers = {"Authorization": f"token {GIST_TOKEN}"}
