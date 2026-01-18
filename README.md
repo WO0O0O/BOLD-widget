@@ -15,7 +15,7 @@ Built by Daniel Wooster.
 ## Stack
 
 - **Scheduler:** GitHub Actions
-- **AI:** Gemini 2.0 Flash
+- **AI:** Gemini 1.5 Flash
 - **Prices:** CoinGecko API
 - **Search:** ddgs (DuckDuckGo)
 - **Storage:** GitHub Gist
