@@ -1,4 +1,4 @@
-# Crypto Widget
+# BOLD Widget
 
 Free iPhone widget that shows live BTC and Gold prices with market analysis. Runs on GitHub Actions, uses Gemini AI for analysis, stores data in a Gist, displays via Scriptable.
 
@@ -6,7 +6,7 @@ Built by Daniel Wooster.
 
 ## How it works
 
-1. GitHub Action runs every 30 mins
+1. GitHub Action runs hourly (6am-10pm UTC)
 2. Python script fetches prices (CoinGecko) and news (DuckDuckGo)
 3. Gemini analyses the data and outputs a market report
 4. Report saved to a public Gist
@@ -15,7 +15,7 @@ Built by Daniel Wooster.
 ## Stack
 
 - **Scheduler:** GitHub Actions
-- **AI:** Gemini 1.5 Flash
+- **AI:** Gemini 2.5 Flash-Lite
 - **Prices:** CoinGecko API
 - **Search:** ddgs (DuckDuckGo)
 - **Storage:** GitHub Gist
@@ -24,8 +24,8 @@ Built by Daniel Wooster.
 ## Files
 
 - `main.py` - fetches data and calls Gemini
-- `CryptoTick.js` - Scriptable widget code
-- `.github/workflows/daily_update.yml` - runs every 30 mins
+- `BOLD_widget.js` - Scriptable widget code
+- `.github/workflows/daily_update.yml` - runs hourly
 
 ## Docs
 
